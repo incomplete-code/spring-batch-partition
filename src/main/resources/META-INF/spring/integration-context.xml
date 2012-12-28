@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.2.xsd">
+
+	<!--  master send and receive -->
+
+	<int:channel id="request.channel"/>
+	
+	<int-jms:outbound-gateway request-channel="request.channel" reply-channel="reply.channel" 
+		request-destination="request.queue" reply-destination="reply.queue" receive-timeout="30000"><!--  30 second -->
+		<int-jms:reply-listener/>
+	</int-jms:outbound-gateway>
+
+	<int:channel id="reply.channel"/>
+
+	<int:aggregator input-channel="reply.channel" ref="messageChannelPartitionHandler"/>
+	
+	<!--  slave -->
+	
+	<int-jms:inbound-gateway request-channel="worker.request.channel" request-destination="request.queue"
+		 concurrent-consumers="2"/>
+
+	<int:channel id="worker.request.channel"/>
+	
+	<int:service-activator input-channel="worker.request.channel" ref="stepExecutionRequestHandler"/>
+
+</beans>
