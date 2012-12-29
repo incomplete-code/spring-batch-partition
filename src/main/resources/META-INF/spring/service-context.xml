@@ -62,16 +62,38 @@
 			class="org.apache.activemq.ActiveMQConnectionFactory">
 			<property name="brokerURL" value="vm://localhost?broker.persistent=false"/>
 		</bean>
-		<bean id="request.queue"
-			class="org.apache.activemq.command.ActiveMQQueue">
-			<constructor-arg value="test.request.queue"/>
+<!-- 		<bean id="request.queue" -->
+<!-- 			class="org.apache.activemq.command.ActiveMQQueue"> -->
+<!-- 			<constructor-arg value="test.request.queue"/> -->
+<!-- 		</bean> -->
+<!-- 		<bean id="reply.queue" -->
+<!-- 			class="org.apache.activemq.command.ActiveMQQueue"> -->
+<!-- 			<constructor-arg value="test.reply.queue"/> -->
+<!-- 		</bean>	 -->
+		
+		<!-- amqp config -->
+
+		<bean id="amqpConnectionFactory"
+			class="org.apache.qpid.client.AMQConnectionFactory">
+			<property name="connectionURLString" value="amqp://guest:guest@test/?brokerlist=vm://1"/>
 		</bean>
-		<bean id="reply.queue"
-			class="org.apache.activemq.command.ActiveMQQueue">
-			<constructor-arg value="test.reply.queue"/>
+		
+		<bean id="request.queue"
+			class="org.apache.qpid.client.AMQAnyDestination">
+			<property name="addressName" value="test.request.queue"/>
+			<property name="addressType" value="1"/>
 		</bean>		
 		
+		<bean id="reply.queue"
+			class="org.apache.qpid.client.AMQAnyDestination">
+			<property name="addressName" value="test.reply.queue"/>
+			<property name="addressType" value="1"/>
+		</bean>				
+		
+				
 	</beans>
 	
+
+
 
 </beans>
